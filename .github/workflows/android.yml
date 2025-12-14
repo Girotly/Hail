@@ -14,24 +14,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.event.head_commit.message, '[skip ci]') }}
-        steps:
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
+
       - name: Build with Gradle
         run: |
-          echo "commit=$(echo ${{ github.sha }} | cut -c-7)" >> $GITHUB_ENV
-          touch signing.properties
-          echo storeFile=../keystore.jks >> signing.properties
-          echo storePassword=${{ secrets.KEYSTORE_PASSWORD }} >> signing.properties
-          echo keyAlias=${{ secrets.KEYSTORE_ALIAS }} >> signing.properties
-          echo keyPassword=${{ secrets.KEYSTORE_ALIAS_PASSWORD }} >> signing.properties
-          echo ${{ secrets.KEYSTORE }} | base64 --decode > keystore.jks
+          echo "commit=\( (echo \){{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
           ./gradlew assembleRelease
+
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4
         with:
